@@ -12,8 +12,8 @@ if($status == "0\n"){
   /**
    * The WebSocket server is not started. So we, start it
    */
-  echo "php $docRoot/bg.php > /dev/null &";
-	var_dump(exec("php $docRoot/bg.php > /dev/null &"));
+	exec("echo \${OPENSHIFT_PHP_IP};php $docRoot/bg.php 2> /dev/null &1", $output);
+  var_dump($output);
 }
 ?>
 <!DOCTYPE html>
