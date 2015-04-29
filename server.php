@@ -21,7 +21,7 @@ if(isset($startNow)){
 				new BaseServer()
 			)
 		),
-		8082,
+		8080,
 		$ip
 	);
 	$server->run();
