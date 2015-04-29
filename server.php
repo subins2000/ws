@@ -5,7 +5,7 @@ use Ratchet\WebSocket\WsServer;
 
 function shutdown(){
 	global $docRoot;
-	file_put_contents("$docRoot/status.txt", "0");
+	file_put_contents("$docRoot/status.txt", "0\n");
 	//require_once "$docRoot/index.php";
 }
 register_shutdown_function('shutdown');
@@ -21,7 +21,7 @@ if(isset($startNow)){
 				new BaseServer()
 			)
 		),
-		8080,
+		8082,
 		$ip
 	);
 	$server->run();

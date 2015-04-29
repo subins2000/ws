@@ -2,21 +2,18 @@
 require_once __DIR__ . "/config.php";
 
 $status = file_get_contents(__DIR__ . "/status.txt");
-if($status == "0"){
+var_dump($status == "0\n");
+if($status == "0\n"){
   /**
    * Kill Apache
    */
-  system("kill $(ps aux | grep 'httpd' | awk '{print $2}')");
+  exec("kill $(ps aux | grep 'httpd' | awk '{print $2}')");
   
   /**
    * The WebSocket server is not started. So we, start it
    */
-	function execInbg($cmd) { 
-    exec($cmd . " > /dev/null &");
-	}
-	execInbg("php $docRoot/bg.php");
-  
-  file_put_contents(__DIR__ . "/status.txt", "1");
+  echo "php $docRoot/bg.php > /dev/null &";
+	var_dump(exec("php $docRoot/bg.php > /dev/null &"));
 }
 ?>
 <!DOCTYPE html>
