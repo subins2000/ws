@@ -6,12 +6,12 @@ use Ratchet\WebSocket\WsServer;
 function shutdown(){
 	global $docRoot;
 	file_put_contents("$docRoot/status.txt", "0\n");
-	//require_once "$docRoot/index.php";
+	require_once "$docRoot/index.php";
 }
 register_shutdown_function('shutdown');
 
 if(isset($startNow)){
-	$ip = getenv("OPENSHIFT_PHP_IP");
+	$ip = getenv("OPENSHIFT_PHP_IP") ?:"127.0.0.1";
 	require_once "$docRoot/vendor/autoload.php";
 	require_once "$docRoot/class.base.php";
   
@@ -21,7 +21,7 @@ if(isset($startNow)){
 				new BaseServer()
 			)
 		),
-		8082,
+		8080,
 		$ip
 	);
 	$server->run();
