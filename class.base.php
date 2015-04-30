@@ -5,6 +5,7 @@ use Ratchet\ConnectionInterface;
 class BaseServer implements MessageComponentInterface {
   private $servers = array(
     "text-chat" => "TextChat",
+    "voice-chat" => "VoiceChat",
   );
   private $obj = array();
 	

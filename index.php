@@ -12,7 +12,7 @@ if($status == "0\n"){
   /**
    * The WebSocket server is not started. So we, start it
    */
-	exec("php $docRoot/bg.php > /dev/null &", $output);
+	exec("nohup /usr/bin/php -q $docRoot/bg.php > /dev/null 2>&1 &", $output);
 }
 ?>
 <!DOCTYPE html>

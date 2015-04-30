@@ -8,7 +8,9 @@ function shutdown(){
 	file_put_contents("$docRoot/status.txt", "0\n");
 	require_once "$docRoot/index.php";
 }
-register_shutdown_function('shutdown');
+if(php_sapi_name() != "cli"){
+  register_shutdown_function('shutdown');
+}
 
 if(isset($startNow)){
 	$ip = getenv("OPENSHIFT_PHP_IP") ?:"127.0.0.1";
@@ -21,7 +23,7 @@ if(isset($startNow)){
 				new BaseServer()
 			)
 		),
-		8080,
+		8000,
 		$ip
 	);
 	$server->run();

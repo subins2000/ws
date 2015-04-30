@@ -2,7 +2,7 @@
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class TextChatServer implements MessageComponentInterface {
+class VoiceChatServer implements MessageComponentInterface {
 	protected $clients;
 	private $dbh;
 	private $users = array();
@@ -16,7 +16,6 @@ class TextChatServer implements MessageComponentInterface {
 	
 	public function onOpen(ConnectionInterface $conn) {
     $this->clients[$conn->resourceId] = $conn;
-		$this->send($conn, "fetch", $this->fetchMessages());
 		$this->checkOnliners($conn);
 		echo "New connection! ({$conn->resourceId})\n";
 	}
@@ -42,15 +41,10 @@ class TextChatServer implements MessageComponentInterface {
           $this->send($conn, "register", "taken");
         }
 			}elseif($type == "send" && $user !== false){
-				$msg = htmlspecialchars($data['data']['msg']);
-				$sql = $this->dbh->prepare("INSERT INTO `wsMessages` (`name`, `msg`, `posted`) VALUES(?, ?, NOW())");
-				$sql->execute(array($user, $msg));
-        
-				foreach($this->clients as $client) {
-					$this->send($client, "single", array("name" => $user, "msg" => $msg, "posted" => date("Y-m-d H:i:s")));
-				}
-			}elseif($type == "fetch"){
-				$this->send($conn, "fetch", $this->fetchMessages());
+				$audio = $data['data']['audio'];
+        foreach($this->clients as $client){
+          $this->send($client, "msg", $audio);
+        }
 			}elseif($type == "onliners"){
         $this->checkOnliners($conn);
       }
@@ -69,8 +63,8 @@ class TextChatServer implements MessageComponentInterface {
 		if(isset($this->users[$conn->resourceId])){
 			unset($this->users[$conn->resourceId]);
 		}
-    $this->checkOnliners($conn);
     $conn->close();
+    $this->checkOnliners();
 	}
 	
 	/* My custom functions */
