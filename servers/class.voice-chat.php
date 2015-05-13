@@ -55,8 +55,8 @@ class VoiceChatServer implements MessageComponentInterface {
 		if(isset($this->users[$conn->resourceId])){
 			unset($this->users[$conn->resourceId]);
 		}
-		unset($this->clients[$conn->resourceId]);
     $this->checkOnliners($conn);
+		unset($this->clients[$conn->resourceId]);
 	}
 
 	public function onError(ConnectionInterface $conn, \Exception $e) {

@@ -6,8 +6,18 @@ class BaseServer implements MessageComponentInterface {
   private $servers = array(
     "text-chat" => "TextChat",
     "voice-chat" => "VoiceChat",
+    "advanced-chat" => "AdvancedChat"
   );
   private $obj = array();
+  
+  public function __construct(){
+    $endTime = time() + 300;
+    while (true) {
+      if (time() > $endTime) {
+        exit;
+      }
+    }
+  }
 	
 	public function onOpen(ConnectionInterface $conn) {
 		$this->getService($conn);
@@ -27,17 +37,17 @@ class BaseServer implements MessageComponentInterface {
 
 	public function onMessage(ConnectionInterface $conn, $data) {
 		$this->getService($conn);
-    return $this->obj[$_GET['service']]->onMessage($conn, $data);
+    return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onMessage($conn, $data) : "";
 	}
 
 	public function onClose(ConnectionInterface $conn) {
 		$this->getService($conn);
-    return $this->obj[$_GET['service']]->onClose($conn);
+    return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onClose($conn) : "";
 	}
 
 	public function onError(ConnectionInterface $conn, \Exception $e) {
 		$this->getService($conn);
-    return $this->obj[$_GET['service']]->onError($conn, $e);
+    return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onError($conn, $e) : "";
 	}
   
   public function getService(ConnectionInterface $conn){

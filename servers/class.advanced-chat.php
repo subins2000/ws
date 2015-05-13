@@ -2,7 +2,7 @@
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class TextChatServer implements MessageComponentInterface {
+class AdvancedChatServer implements MessageComponentInterface {
 	protected $clients;
 	private $dbh;
 	private $users = array();
@@ -16,7 +16,6 @@ class TextChatServer implements MessageComponentInterface {
 	
 	public function onOpen(ConnectionInterface $conn) {
     $this->clients[$conn->resourceId] = $conn;
-		$this->send($conn, "fetch", $this->fetchMessages());
 		$this->checkOnliners($conn);
 		echo "New connection! ({$conn->resourceId})\n";
 	}
@@ -27,30 +26,32 @@ class TextChatServer implements MessageComponentInterface {
     
 		if(isset($data['data']) && count($data['data']) != 0){
 			$type = $data['type'];
-			$user = isset($this->users[$id]) ? $this->users[$id]['name'] : false;
+			$user = isset($this->users[$id]) ? $this->users[$id] : false;
       
 			if($type == "register"){
 				$name = htmlspecialchars($data['data']['name']);
-        if(array_search($name, array_map(function($element){return $element['name'];}, $this->users)) === false){
-				  $this->users[$id] = array(
-					  "name" 	=> $name,
-  					"seen"	=> time()
-				  );
+        if(array_search($name, $this->users) === false){
+				  $this->users[$id] = $name;
           $this->send($conn, "register", "success");
           $this->checkOnliners($conn);
         }else{
           $this->send($conn, "register", "taken");
         }
-			}elseif($type == "send" && $user !== false){
-				$msg = htmlspecialchars($data['data']['msg']);
-				$sql = $this->dbh->prepare("INSERT INTO `wsMessages` (`name`, `msg`, `posted`) VALUES(?, ?, NOW())");
-				$sql->execute(array($user, $msg));
+			}elseif($type == "send" && isset($data['data']['type']) && $user !== false){
+				if($data['data']['type'] == "text"){
+          $msg = htmlspecialchars($data['data']['msg']);
+				  $sql = $this->dbh->prepare("INSERT INTO `wsMessages` (`name`, `msg`, `posted`) VALUES(?, ?, NOW())");
+				  $sql->execute(array($user, $msg));
+          $return = array(
+          
+          );
+        }elseif($data['data']['type'] == "audio"){
         
-				foreach($this->clients as $client) {
-					$this->send($client, "single", array("name" => $user, "msg" => $msg, "posted" => date("Y-m-d H:i:s")));
-				}
-			}elseif($type == "fetch"){
-				$this->send($conn, "fetch", $this->fetchMessages());
+        }
+        
+        foreach($this->clients as $client){
+          $this->send($client, "msg", $return);
+        }
 			}elseif($type == "onliners"){
         $this->checkOnliners($conn);
       }
@@ -61,39 +62,27 @@ class TextChatServer implements MessageComponentInterface {
 		if(isset($this->users[$conn->resourceId])){
 			unset($this->users[$conn->resourceId]);
 		}
-		unset($this->clients[$conn->resourceId]);
     $this->checkOnliners($conn);
+		unset($this->clients[$conn->resourceId]);
 	}
 
 	public function onError(ConnectionInterface $conn, \Exception $e) {
 		if(isset($this->users[$conn->resourceId])){
 			unset($this->users[$conn->resourceId]);
 		}
-    $this->checkOnliners($conn);
     $conn->close();
+    $this->checkOnliners();
 	}
 	
 	/* My custom functions */
 	public function fetchMessages(){
-		$sql = $this->dbh->prepare("SELECT * FROM `wsMessages`");
-    $sql->execute();
+		$sql = $this->dbh->query("SELECT * FROM `wsMessages`");
 		$msgs = $sql->fetchAll();
 		return $msgs;
 	}
 	
 	public function checkOnliners(ConnectionInterface $conn){
 		date_default_timezone_set("UTC");
-		if(isset($this->users[$conn->resourceId])){
-			$this->users[$conn->resourceId]['seen'] = time();
-		}
-		
-		$limit_time = strtotime('-10 seconds');
-		foreach($this->users as $id => $user){
-			$usertime = $user['seen'];
-			if($usertime < $limit_time){
-				unset($this->users[$id]);
-			}
-		}
 		
 		/**
      * Send online users to everyone
