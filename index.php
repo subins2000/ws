@@ -1,19 +1,23 @@
 <?php
 require_once __DIR__ . "/config.php";
 
-$status = file_get_contents(__DIR__ . "/status.txt");
-var_dump($status == "0\n");
-if($status == "0\n"){
-  /**
-   * Kill Apache
-   */
-  exec("kill $(ps aux | grep 'httpd' | awk '{print $2}')");
+/**
+ * Kill Apache
+ */
+exec("kill $(ps aux | grep 'httpd' | awk '{print $2}')");
   
-  /**
-   * The WebSocket server is not started. So we, start it
-   */
-	exec("nohup php -q '$docRoot/bg.php' > /dev/null 2>&1 &", $output);
-}
+/**
+ * Kill existing WS servers
+ */
+exec("kill $(ps aux | grep 'bg.php' | awk '{print $2}')");
+exec("kill $(ps aux | grep 'cron.php' | awk '{print $2}')");
+file_put_contents(__DIR__ . "/active.txt", "0\n"); // No Active Connections as server was killed
+
+/**
+ * The WebSocket server is not started. So we, start it
+ */
+exec("nohup php -q '$docRoot/bg.php' > /dev/null 2>&1 &");
+exec("nohup php -q '$docRoot/cron.php' > /dev/null 2>&1 &");
 ?>
 <!DOCTYPE html>
 <html>

@@ -9,15 +9,7 @@ class BaseServer implements MessageComponentInterface {
     "advanced-chat" => "AdvancedChat"
   );
   private $obj = array();
-  
-  public function __construct(){
-    $endTime = time() + 300;
-    while (true) {
-      if (time() > $endTime) {
-        exit;
-      }
-    }
-  }
+  public $clients = array();
 	
 	public function onOpen(ConnectionInterface $conn) {
 		$this->getService($conn);
@@ -29,6 +21,9 @@ class BaseServer implements MessageComponentInterface {
         $this->obj[$_GET['service']] = new $className;
       }
       $this->obj[$_GET['service']]->onOpen($conn);
+      
+      $this->clients[$conn->resourceId] = $conn;
+      file_put_contents(__DIR__ . "/active.txt", "1\n");
     }else{
       $conn->close();
       return false;
@@ -42,11 +37,27 @@ class BaseServer implements MessageComponentInterface {
 
 	public function onClose(ConnectionInterface $conn) {
 		$this->getService($conn);
+    
+    if(isset($this->clients[$conn->resourceId])){
+			unset($this->clients[$conn->resourceId]);
+		}
+    if(count($this->clients) == 0){
+      file_put_contents(__DIR__ . "/active.txt", "0\n");
+    }
+    
     return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onClose($conn) : "";
 	}
 
 	public function onError(ConnectionInterface $conn, \Exception $e) {
 		$this->getService($conn);
+    
+    if(isset($this->clients[$conn->resourceId])){
+			unset($this->clients[$conn->resourceId]);
+		}
+    if(count($this->clients) == 0){
+      file_put_contents(__DIR__ . "/active.txt", "0\n");
+    }
+    
     return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onError($conn, $e) : "";
 	}
   

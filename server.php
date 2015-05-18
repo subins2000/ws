@@ -2,18 +2,6 @@
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
-
-function shutdown(){
-	global $docRoot;
-	file_put_contents("$docRoot/status.txt", "0\n");
-	include "$docRoot/index.php";
-}
-
-if(php_sapi_name() == "cli"){
-  register_shutdown_function('shutdown');
-}
-
-global $startNow, $docRoot, $dbh;
   
 if(isset($startNow)){
   $ip = getenv("OPENSHIFT_PHP_IP") ?:"127.0.0.1";

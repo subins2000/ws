@@ -3,13 +3,11 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class TextChatServer implements MessageComponentInterface {
-	protected $clients;
 	private $dbh;
 	private $users = array();
 	
 	public function __construct() {
     global $dbh, $docRoot;
-    $this->clients = array();
     $this->dbh = $dbh;
     $this->root = $docRoot;
   }
