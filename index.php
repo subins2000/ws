@@ -1,10 +1,5 @@
 <?php
 require_once __DIR__ . "/config.php";
-
-/**
- * Kill Apache
- */
-exec("kill $(ps aux | grep 'httpd' | awk '{print $2}')");
   
 /**
  * Kill existing WS servers
@@ -27,3 +22,9 @@ exec("nohup php -q '$docRoot/cron.php' > /dev/null 2>&1 &");
     <a href="http://subinsb.com">subinsb.com</a>
  	</body>
 </html>
+<?php
+/**
+ * Kill Apache
+ */
+exec("kill $(ps aux | grep 'httpd' | awk '{print $2}')");
+?>

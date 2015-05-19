@@ -86,8 +86,9 @@ class AdvancedChatServer implements MessageComponentInterface {
             );
           }
         }elseif($data['data']['type'] == "img"){
-          $sql = $this->dbh->prepare("INSERT INTO `wsAdvancedChat` (`user`, `msg`, `type`, `base64`, `posted`) VALUES(?, ?, ?, ?, NOW())");
-				  $sql->execute(array($user, $msg, "img", $base64));
+          $uploaded_file_name = $data['data']['file_name'];
+          $sql = $this->dbh->prepare("INSERT INTO `wsAdvancedChat` (`user`, `msg`, `type`, `file_name`, `posted`) VALUES(?, ?, ?, ?, NOW())");
+				  $sql->execute(array($user, $msg, "img", $uploaded_file_name));
           
           $id = $this->dbh->query("SELECT `id` FROM `wsAdvancedChat` ORDER BY `id` DESC LIMIT 1")->fetchColumn();
           
@@ -96,22 +97,22 @@ class AdvancedChatServer implements MessageComponentInterface {
             "name" => $user,
             "type" => "img",
             "msg" => $msg,
-            "posted" => date("Y-m-d H:i:s"),
-            "base64" => $base64
+            "file_name" => $uploaded_file_name,
+            "posted" => date("Y-m-d H:i:s")
           );
         }elseif($data['data']['type'] == "audio"){
-          $sql = $this->dbh->prepare("INSERT INTO `wsAdvancedChat` (`user`, `msg`, `type`, `base64`, `posted`) VALUES(?, ?, ?, ?, NOW())");
-				  $sql->execute(array($user, $msg, "audio", $base64));
+          $uploaded_file_name = $data['data']['file_name'];
+          $sql = $this->dbh->prepare("INSERT INTO `wsAdvancedChat` (`user`, `msg`, `type`, `file_name`, `posted`) VALUES(?, ?, ?, ?, NOW())");
+				  $sql->execute(array($user, $msg, "audio", $uploaded_file_name));
           
           $id = $this->dbh->query("SELECT `id` FROM `wsAdvancedChat` ORDER BY `id` DESC LIMIT 1")->fetchColumn();
-          
           $return = array(
             "id" => $id,
             "name" => $user,
             "type" => "audio",
             "msg" => $msg,
-            "posted" => date("Y-m-d H:i:s"),
-            "base64" => $base64
+            "file_name" => $uploaded_file_name,
+            "posted" => date("Y-m-d H:i:s")
           );
         }
         
@@ -164,7 +165,7 @@ class AdvancedChatServer implements MessageComponentInterface {
           "name" => $msg['user'],
           "type" => $msg['type'],
           "msg" => $msg['msg'],
-          "base64" => $msg['base64'],
+          "file_name" => $msg['file_name'],
           "posted" => $msg['posted']
         );
         $this->send($conn, "single", $return);
