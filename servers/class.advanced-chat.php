@@ -54,7 +54,7 @@ class AdvancedChatServer implements MessageComponentInterface {
         if($data['data']['type'] == "text"){
 				  $sql = $this->dbh->prepare("SELECT `id`, `user`, `msg`, `type` FROM `wsAdvancedChat` ORDER BY `id` DESC LIMIT 1");
           $sql->execute();
-          $lastMsg = $sql->fetch();
+          $lastMsg = $sql->fetch(PDO::FETCH_ASSOC);
           
           if($lastMsg['user'] == $user && $lastMsg['type'] == "text"){
             // Append message
@@ -152,9 +152,9 @@ class AdvancedChatServer implements MessageComponentInterface {
 	public function fetchMessages(ConnectionInterface $conn, $id = ""){
 		if($id == ""){
       $sql = $this->dbh->query("SELECT * FROM `wsAdvancedChat` ORDER BY `id` ASC");
-      $msgCount = count($sql);
 		  $msgs = $sql->fetchAll();
-      
+      $msgCount = count($msgs);
+
       if($msgCount > 5){
         $msgs = array_slice($msgs, $msgCount - 5, $msgCount);
       }
@@ -193,9 +193,9 @@ class AdvancedChatServer implements MessageComponentInterface {
         $this->send($conn, "single", $return);
       }
 
-      rsort($msgs);
+      sort($msgs);
       $firstID = $msgs[0]['id'];
-      if($firstID != 1){
+      if($firstID != "1"){
         $this->send($conn, "single", array(
           "type" => "more_messages"
         ));
