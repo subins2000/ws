@@ -8,6 +8,7 @@ exec("kill $(ps aux | grep 'bg.php' | awk '{print $2}')");
 exec("kill $(ps aux | grep 'cron.php' | awk '{print $2}')");
 file_put_contents(__DIR__ . "/active.txt", "0\n"); // No Active Connections as server was killed
 
+sleep(3);
 /**
  * The WebSocket server is not started. So we, start it
  */
