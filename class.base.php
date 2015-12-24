@@ -6,7 +6,8 @@ class BaseServer implements MessageComponentInterface {
   private $servers = array(
     "text-chat" => "TextChat",
     "voice-chat" => "VoiceChat",
-    "advanced-chat" => "AdvancedChat"
+    "advanced-chat" => "AdvancedChat",
+    "pi" => "Pi"
   );
   private $obj = array();
   public $clients = array();
@@ -45,7 +46,9 @@ class BaseServer implements MessageComponentInterface {
       file_put_contents(__DIR__ . "/active.txt", "0\n");
     }
     
-    return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onClose($conn) : "";
+    if(isset($_GET['service'])){
+      return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onClose($conn) : "";
+    }
 	}
 
 	public function onError(ConnectionInterface $conn, \Exception $e) {
@@ -64,6 +67,7 @@ class BaseServer implements MessageComponentInterface {
   public function getService(ConnectionInterface $conn){
     $querystring = $conn->WebSocket->request->getQuery();
     $_GET['service'] = explode("=", $querystring);
+    
     if(isset($_GET['service'][1])){
       $_GET['service'] = $_GET['service'][1];
     }else{
