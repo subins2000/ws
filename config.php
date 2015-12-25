@@ -16,5 +16,16 @@ if( !isset($dbh) ){
   /**
    * Change The Credentials to connect to database.
    */
+   
+  function isRunning(){
+    exec("ps aux | grep '/bg.php';", $out);
+    foreach($out as $o){
+      if(strpos($o, 'php ') !== false){
+        return true;
+        break;
+      }
+    }
+    return false;
+  }
 }
 ?>

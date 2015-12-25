@@ -24,7 +24,6 @@ class BaseServer implements MessageComponentInterface {
       $this->obj[$_GET['service']]->onOpen($conn);
       
       $this->clients[$conn->resourceId] = $conn;
-      file_put_contents(__DIR__ . "/active.txt", "1\n");
     }else{
       $conn->close();
       return false;
@@ -42,9 +41,6 @@ class BaseServer implements MessageComponentInterface {
     if(isset($this->clients[$conn->resourceId])){
 			unset($this->clients[$conn->resourceId]);
 		}
-    if(count($this->clients) == 0){
-      file_put_contents(__DIR__ . "/active.txt", "0\n");
-    }
     
     if(isset($_GET['service'])){
       return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onClose($conn) : "";
@@ -57,9 +53,6 @@ class BaseServer implements MessageComponentInterface {
     if(isset($this->clients[$conn->resourceId])){
 			unset($this->clients[$conn->resourceId]);
 		}
-    if(count($this->clients) == 0){
-      file_put_contents(__DIR__ . "/active.txt", "0\n");
-    }
     
     return isset($this->obj[$_GET['service']]) ? $this->obj[$_GET['service']]->onError($conn, $e) : "";
 	}

@@ -2,6 +2,7 @@
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
+$GLOBALS['allow_user_to_run'] = false;
 class PiServer implements MessageComponentInterface {
   protected $clients;
   private $dbh;
@@ -42,16 +43,20 @@ class PiServer implements MessageComponentInterface {
         $this->send($conn, "pi", $pi);
       }
     }else if(substr($message, 0, 3) == "run"){
-      if($this->piProcessRunning()){
-        $this->sendToAll("running_as_per_user_request");
-      }else{
-        $digits = substr($message, 4);
-        if(is_numeric($digits) && $digits > 5 && $digits < 100000000){
-          $this->runPiFindingProcess($digits);
+      if($GLOBALS['allow_user_to_run']){
+        if($this->piProcessRunning()){
           $this->sendToAll("running_as_per_user_request");
         }else{
-          $this->send($conn, "invalid_digits");
+          $digits = substr($message, 4);
+          if(is_numeric($digits) && $digits > 5 && $digits <= 100000000){
+            $this->runPiFindingProcess($digits);
+            $this->sendToAll("running_as_per_user_request");
+          }else{
+            $this->send($conn, "invalid_digits");
+          }
         }
+      }else{
+        $this->send($conn, "not_allowed");
       }
     }
   }
