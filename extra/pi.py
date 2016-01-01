@@ -11,7 +11,7 @@ digits_to_calculate = int(sys.argv[1])
 db = MySQLdb.connect(host=os.environ["OPENSHIFT_MYSQL_DB_HOST"],    # your host, usually localhost
                      user=os.environ["OPENSHIFT_MYSQL_DB_USERNAME"],         # your username
                      passwd=os.environ["OPENSHIFT_MYSQL_DB_PASSWORD"],  # your password
-                     db="test")
+                     db="ws")
 cur = db.cursor()
 
 # The time when program start
