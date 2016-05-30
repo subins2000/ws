@@ -5,7 +5,7 @@ if(!isRunning()){
   /**
    * The WebSocket server is not started. So we, start it
    */
-  exec("nohup php -q '$docRoot/bg.php' > /dev/null 2>&1 &");
+  exec("nohup php -q '$docRoot/run.php' > /dev/null 2>&1 &");
 }
 ?>
 <!DOCTYPE html>
