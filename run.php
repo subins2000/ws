@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-$host = getenv('WS_HOST') ?: '192.168.1.2';
-$port = getenv('WS_PORT') ?: '8000';
+$host = getenv('PORT') ? '0.0.0.0' : '192.168.1.2';
+$port = getenv('PORT') ?: '8000';
 
 $DS = new Fr\DiffSocket(array(
     'server'   => array(
